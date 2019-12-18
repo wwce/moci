@@ -23,7 +23,7 @@ variable build-version {
 }
 
 variable vnet-type {
-  
+
 }
 
 variable in_fw_avset_name {

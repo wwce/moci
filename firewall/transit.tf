@@ -7,7 +7,7 @@ data "azurerm_resource_group" "existing_security_rg" {
 }
 
 data "azurerm_virtual_network" "existing_vnet" {
-  name = "vnet-hub-prod-001"
+  name                = "vnet-hub-prod-001"
   resource_group_name = "rg-networking-prod-001"
 }
 
@@ -63,7 +63,7 @@ module "vmseries-out" {
   fw_bootstrap_share_directory = var.out_fw_bootstrap_share_directory
   prefix                       = var.prefix
   build-version                = var.build-version
-  dev-environment = var.dev-environment
+  dev-environment              = var.dev-environment
 }
 
 #-----------------------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ module "vmseries-in" {
   fw_bootstrap_share_directory = var.in_fw_bootstrap_share_directory
   prefix                       = var.prefix
   build-version                = var.build-version
-  dev-environment = var.dev-environment
+  dev-environment              = var.dev-environment
 }
 
 
@@ -110,12 +110,14 @@ module "internal_lb" {
   backend_pool_interfaces = module.vmseries-out.nic2_id
   subnet_id               = data.azurerm_subnet.fwtrust_subnet.id
   private_ip_address      = var.internal_lb_address
+  build-version           = var.build-version
+  dev-environment         = var.dev-environment
 }
 
 module "public_lb" {
   source                  = "./modules/lb/"
-  location            = data.azurerm_resource_group.existing_security_rg.location
-  resource_group_name = data.azurerm_resource_group.existing_security_rg.name
+  location                = data.azurerm_resource_group.existing_security_rg.location
+  resource_group_name     = data.azurerm_resource_group.existing_security_rg.name
   type                    = "public"
   name                    = var.public_lb_name
   probe_ports             = [22]
@@ -124,5 +126,7 @@ module "public_lb" {
   protocol                = "Tcp"
   backend_pool_count      = length(var.in_fw_names)
   backend_pool_interfaces = module.vmseries-in.nic1_id
+  build-version           = var.build-version
+  dev-environment         = var.dev-environment
 }
 
