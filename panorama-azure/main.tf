@@ -1,10 +1,11 @@
 
 data "azurerm_resource_group" "existing_vnet_rg" {
-  name = "rg-networking-prod-001"
+//  name = "rg-networking-prod-001"
+  name = var.vnet_rg
 }
 
 data "azurerm_resource_group" "existing_security_rg" {
-  name = "rg-security-prod-001"
+  name = var.security_rg
 }
 
 
@@ -20,6 +21,14 @@ resource "azurerm_managed_disk" "disk" {
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
   disk_size_gb         = "2000"
+}
+
+resource "azurerm_virtual_machine_data_disk_attachment" "rama_logs" {
+
+  managed_disk_id    = azurerm_managed_disk.disk.id
+  virtual_machine_id = azurerm_virtual_machine.panorama.id
+  lun                = 10
+  caching            = "ReadWrite"
 }
 
 data "azurerm_subnet" "panorama_mgmt_subnet" {
