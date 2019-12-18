@@ -1,7 +1,8 @@
-
-
+vnet_rg="rg-networking-prod-001"
+security_rg="rg-security-prod-001"
 vnet-location = "hub"
 dev-environment = "prod"
 build-version = "001"
 rama_name = "moci-rama"
 rama_nsg_prefix = "0.0.0.0/0"
+rama_username = "panadmin"
