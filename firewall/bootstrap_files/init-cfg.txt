@@ -11,5 +11,5 @@ panorama-server=172.16.96.196
 panorama-server-2=
 tplname=moci-prod-001-templstk
 dgname=moci-prod-001-dg
-moci-prod-001-templstk
+
 
