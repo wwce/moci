@@ -1,14 +1,14 @@
 fw_license                   = "bundle2" #"byol" #"bundle1" 
-out_fw_bootstrap_storage_account = ""
-out_fw_bootstrap_access_key      = ""
-out_fw_bootstrap_file_share      = ""
-out_fw_bootstrap_share_directory = "None"
+out_fw_bootstrap_storage_account = "mocifwbootstrapprod001"
+out_fw_bootstrap_access_key      = "hpij1GyBn287dVnlsnt+/E4VUbU9Hyqj3JoYXSA5Jqr1aOIDJALwL4qbQHf2MUve100as+DxhesNtrvNOL/q5Q=="
+out_fw_bootstrap_file_share      = "panwbootstrap"
+out_fw_bootstrap_share_directory = "outfwboot"
 
 
-in_fw_bootstrap_storage_account = ""
-in_fw_bootstrap_access_key      = ""
-in_fw_bootstrap_file_share      = ""
-in_fw_bootstrap_share_directory = "None"
+in_fw_bootstrap_storage_account = "mocifwbootstrapprod001"
+in_fw_bootstrap_access_key      = "hpij1GyBn287dVnlsnt+/E4VUbU9Hyqj3JoYXSA5Jqr1aOIDJALwL4qbQHf2MUve100as+DxhesNtrvNOL/q5Q=="
+in_fw_bootstrap_file_share      = "panwbootstrap"
+in_fw_bootstrap_share_directory = "infwboot"
 
 
 # -----------------------------------------------------------------------
