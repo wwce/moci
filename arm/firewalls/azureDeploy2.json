@@ -18,7 +18,7 @@
             }
         },
         "StorageAccountAccessKey": {
-            "defaultValue": "XVnhYs1hyENeow/D6Esi0jfUobpgBv/nAobSSHtibYmmNci8oWR+26N4FadRM5SM6goeK7amxvxvkL2htyt0Bg==",
+            "defaultValue": "XVnhYs1hyENeow/D6Esi0jfUobpgBv/nAob***********************",
             "type": "String",
             "metadata": {
                 "description": "Authentication key to access the storage account"
