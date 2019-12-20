@@ -9,43 +9,44 @@
                 "description": "Virtual Network Name"
             }
         },
-        "virtualNetworkAddressPrefix": {
-            "defaultValue": "172.16.96.0/23",
-            "type": "String",
-            "metadata": {
-                "description": "CIDR for Virtual Network"
-            }
-        },
+
         "BootstrapStorageAccount": {
-            "defaultValue": "scaledfwbootstrap",
+            "defaultValue": "mocifwbootstrapprod001",
             "type": "String",
             "metadata": {
                 "description": "Storage account hosting the bootstrap files"
             }
         },
         "StorageAccountAccessKey": {
-            "defaultValue": "lGCcuTF8rVeolLpNpmlW+m0NE9ust4SqMmfynALSi6I1dHjuDyeVgwSenERpGLyQOlXgMgfmhGjAxu4Co/mmSg==",
+            "defaultValue": "XVnhYs1hyENeow/D6Esi0jfUobpgBv/nAobSSHtibYmmNci8oWR+26N4FadRM5SM6goeK7amxvxvkL2htyt0Bg==",
             "type": "String",
             "metadata": {
                 "description": "Authentication key to access the storage account"
             }
         },
-        "StorageAccountFileShare": {
-            "defaultValue": "sharedfw",
+        "InfwStorageAccountFileShare": {
+            "defaultValue": "infwbootstrap",
+            "type": "String",
+            "metadata": {
+                "description": "The file share in the storage account where the bootstrap files are located"
+            }
+        },
+        "OutfwStorageAccountFileShare": {
+            "defaultValue": "outfwbootstrap",
             "type": "String",
             "metadata": {
                 "description": "The file share in the storage account where the bootstrap files are located"
             }
         },
         "EgressFWFileShareDirectory": {
-            "defaultValue": "egressbootstrap",
+            "defaultValue": "None",
             "type": "String",
             "metadata": {
                 "description": "The subdirectory hosting the bootstrap files. Only required if hosting multiple bootstrap directories on the same share"
             }
         },
         "IngressFWFileShareDirectory": {
-            "defaultValue": "ingressbootstrap",
+            "defaultValue": "None",
             "type": "String",
             "metadata": {
                 "description": "The subdirectory hosting the bootstrap files. Only required if hosting multiple bootstrap directories on the same share"
@@ -138,20 +139,6 @@
                 "description": "Password for the administrator account of all VM instances. Must be specified if Authentication Type is 'password'."
             }
         },
-        "networkSecurityGroupName": {
-            "defaultValue": "nsg-fw",
-            "type": "String",
-            "metadata": {
-                "description": "Network Security Group Name"
-            }
-        },
-        "networkSecurityGroupInboundIP": {
-            "defaultValue": "0.0.0.0/0",
-            "type": "String",
-            "metadata": {
-                "description": "Your source public IP address. Added to the inbound NSG on eth0 (MGMT), to restrict access to the deployment."
-            }
-        },
         "enable-palo-alto-bootstrap": {
             "defaultValue": "false",
             "type": "Bool",
@@ -193,8 +180,8 @@
         "managementsubnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('mgmtSubnetName'))]",
         "untrustsubnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('untrustSubnetName'))]",
         "trustsubnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('trustSubnetName'))]",
-        "egressfw-custom-data-field": "[concat('storage-account=', parameters('BootstrapStorageAccount'), ',access-key=', parameters('StorageAccountAccessKey'), ',file-share=', parameters('StorageAccountFileShare'),',share-directory=', parameters('EgressFWFileShareDirectory'))]",
-        "ingressfw-custom-data-field": "[concat('storage-account=', parameters('BootstrapStorageAccount'), ',access-key=', parameters('StorageAccountAccessKey'), ',file-share=', parameters('StorageAccountFileShare'),',share-directory=', parameters('IngressFWFileShareDirectory'))]",
+        "egressfw-custom-data-field": "[concat('storage-account=', parameters('BootstrapStorageAccount'), ',access-key=', parameters('StorageAccountAccessKey'), ',file-share=', parameters('InfwStorageAccountFileShare'),',share-directory=', parameters('EgressFWFileShareDirectory'))]",
+        "ingressfw-custom-data-field": "[concat('storage-account=', parameters('BootstrapStorageAccount'), ',access-key=', parameters('StorageAccountAccessKey'), ',file-share=', parameters('OutfwStorageAccountFileShare'),',share-directory=', parameters('IngressFWFileShareDirectory'))]",
         "fw-resource-prefix": "vm-panwfw",
         "suffix":"[concat('-',parameters('env'),'-',parameters('version'))]",
         "egress-virtualMachine-name-prefix": "[concat(variables('fw-resource-prefix'), '-out')]",
@@ -205,8 +192,8 @@
         "LB-Egress": "[concat(variables('lb-prefix'),'out-fw',variables('suffix'))]",
         "LB-Ingress": "[concat(variables('lb-prefix'),'in-fw',variables('suffix'))]",
         "LB-Ingress-pip": "[concat(variables('pip_prefix'),'lb-fw-ext',variables('suffix'))]",
-        "uniqueId": "[uniqueString(resourceGroup().id)]",
-        "location": "[resourceGroup().location]"
+        "uniqueId": "[uniqueString(resourceGroup().id)]"
+        
     },
     "resources": [
 
