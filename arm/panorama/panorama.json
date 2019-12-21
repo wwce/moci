@@ -1,0 +1,337 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualMachines_panorama_name": {
+      "defaultValue": "panorama",
+      "type": "String"
+    },
+    "virtualNetworkName": {
+      "defaultValue": "vnet-hub-prod-001",
+      "type": "String",
+      "metadata": {
+        "description": "Virtual Network Name"
+      }
+    },
+    "virtualNetworkExistingRGName": {
+      "defaultValue": "rg-networking-prod-001",
+      "type": "String",
+      "metadata": {
+        "description": "Name of resource group of EXISTING VNET"
+      }
+    },
+    "env": {
+      "defaultValue": "dev",
+      "type": "String",
+      "metadata": {
+        "description": "Environment dev/test/prod"
+      }
+    },
+    "version": {
+      "defaultValue": "001",
+      "type": "String",
+      "metadata": {
+        "description": "Build Version eg 001"
+      }
+    },
+    "username": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Username of the administrator account of VM instances"
+      }
+    },
+    "password": {
+      "defaultValue": "",
+      "type": "SecureString",
+      "metadata": {
+        "description": "Password for the administrator account of all VM instances. Must be specified if Authentication Type is 'password'."
+      }
+    },
+    "mgmtSubnetName": {
+      "defaultValue": "ManagementSubnet",
+      "type": "String",
+      "metadata": {
+        "description": "Subnet for Management Network"
+      }
+    },
+    "disktype": {
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Premium_LRS"
+      ],
+      "type": "String"
+    },
+    "panorama-count": {
+      "defaultValue": 1,
+      "allowedValues": [
+        1,
+        2
+      ],
+      "type": "Int",
+      "metadata": {
+        "description": "Number of Panorama VMs to be created."
+      }
+    }
+  },
+  "variables": {
+    "nic_prefix": "nic-",
+    "vnetID": "[resourceId(parameters('virtualNetworkExistingRGName'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+    "managementsubnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('mgmtSubnetName'))]",
+    "panorama-prefix": "vm-panorama-",
+    "suffix": "[concat('-',parameters('env'),'-',parameters('version'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[concat('nsg-fw-mgt', variables('suffix'))]",
+      "apiVersion": "2017-06-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow-All-In",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound",
+              "sourceAddressPrefixes": [
+              ],
+              "destinationAddressPrefixes": [
+              ]
+            }
+          },
+          {
+            "name": "Allow-All-Out",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Outbound",
+              "sourceAddressPrefixes": [
+              ],
+              "destinationAddressPrefixes": [
+              ]
+            }
+          }
+        ],
+        "defaultSecurityRules": [
+          {
+            "name": "AllowVnetInBound",
+            "properties": {
+              "description": "Allow inbound traffic from all VMs in VNET",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 65000,
+              "direction": "Inbound",
+              "sourceAddressPrefixes": [
+              ],
+              "destinationAddressPrefixes": [
+              ]
+            }
+          },
+
+          {
+            "name": "DenyAllInBound",
+            "properties": {
+              "description": "Deny all inbound traffic",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 65500,
+              "direction": "Inbound",
+              "sourceAddressPrefixes": [
+              ],
+              "destinationAddressPrefixes": [
+              ]
+            }
+          },
+          {
+            "name": "AllowVnetOutBound",
+            "properties": {
+              "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 65000,
+              "direction": "Outbound",
+              "sourceAddressPrefixes": [
+              ],
+              "destinationAddressPrefixes": [
+              ]
+            }
+          },
+          {
+            "name": "AllowInternetOutBound",
+            "properties": {
+              "description": "Allow outbound traffic from all VMs to Internet",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "Internet",
+              "access": "Allow",
+              "priority": 65001,
+              "direction": "Outbound",
+              "sourceAddressPrefixes": [
+              ],
+              "destinationAddressPrefixes": [
+              ]
+            }
+          },
+          {
+            "name": "DenyAllOutBound",
+            "properties": {
+              "description": "Deny all outbound traffic",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 65500,
+              "direction": "Outbound",
+              "sourceAddressPrefixes": [
+              ],
+              "destinationAddressPrefixes": [
+              ]
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+      ]
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "sku": {
+        "name": "Standard"
+      },
+      "name": "[concat(variables('panorama-prefix'),'-',copyindex(1),'-pip-', variables('suffix'))]",
+      "apiVersion": "2017-08-01",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "nicPipLoop",
+        "count": "[parameters('panorama-count')]"
+      },
+      "tags": {
+        "displayName": "[concat(variables('panorama-prefix'),'-',copyindex(1),'-pip-', variables('suffix'))]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4"
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(variables('nic_prefix'),variables('panorama-prefix'), copyindex(1), '-mgmt-',variables('suffix'))]",
+      "apiVersion": "2017-09-01",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "nic1Loop",
+        "count": "[parameters('panorama-count')]"
+      },
+      "tags": {
+        "displayName": "[concat(variables('panorama-prefix'), copyindex(1), '-mgmt-',variables('suffix'))]"
+      },
+      "properties": {
+        "enableIPForwarding": true,
+        "enableAcceleratedNetworking": true,
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('managementsubnetRef')]"
+              }
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat('nsg-fw-mgt', variables('suffix')))]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups',concat('nsg-fw-mgt', variables('suffix')))]"
+      ]
+    },    
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2019-03-01",
+        "copy": {
+        "name": "vmLoop",
+        "count": "[parameters('panorama-count')]"
+      },
+      "name": "[concat(variables('panorama-prefix'), copyindex(1))]",
+      "location": "[resourceGroup().location]",
+      "plan": {
+        "name": "byol",
+        "product": "panorama",
+        "publisher": "paloaltonetworks"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_DS5_v2"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "paloaltonetworks",
+            "offer": "panorama",
+            "sku": "byol",
+            "version": "latest"
+          },
+          "osDisk": {
+            "osType": "Linux",
+            "createOption": "FromImage",
+            "caching": "ReadWrite",
+            "managedDisk": {
+              "storageAccountType": "[parameters('disktype')]"
+            }
+          },
+          "dataDisks": []
+        },
+        "osProfile": {
+          "computerName": "[parameters('virtualMachines_panorama_name')]",
+          "adminUsername": "[parameters('username')]",
+          "adminPassword": "[parameters('Password')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": false
+          },
+          "secrets": []
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nic_prefix'),variables('panorama-prefix'), copyindex(1), '-mgmt-',variables('suffix')))]",
+              "name": "[concat(variables('nic_prefix'),variables('panorama-prefix'), copyindex(1), '-mgmt-',variables('suffix'))]",
+              "properties": {
+                "primary": true
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
