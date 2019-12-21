@@ -21,7 +21,7 @@
       }
     },
     "StorageAccountAccessKey": {
-      "defaultValue": "8coj5WZ+5uuwewF6RqGxNTMJQMU9nvxxxxxxx",
+      "defaultValue": "8coj5WZ+5uuwewF6RqGxNTMJQMU9nvvT5Lv1E7x1PDkVZ3FqrU1jxxxxxxxxxxx",
       "type": "String",
       "metadata": {
         "description": "Authentication key to access the storage account"
@@ -136,14 +136,14 @@
       }
     },
     "username": {
-      "defaultValue": "pandemo",
+      "defaultValue": "",
       "type": "String",
       "metadata": {
         "description": "Username of the administrator account of VM instances"
       }
     },
     "password": {
-      "defaultValue": "Dem0pa$$w0rd",
+      "defaultValue": "",
       "type": "SecureString",
       "metadata": {
         "description": "Password for the administrator account of all VM instances. Must be specified if Authentication Type is 'password'."
