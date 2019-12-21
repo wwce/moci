@@ -316,6 +316,25 @@
             <routing-table>
               <ip>
                 <static-route>
+                  <entry name="def">
+                    <path-monitor>
+                      <enable>no</enable>
+                      <failure-condition>any</failure-condition>
+                      <hold-time>2</hold-time>
+                    </path-monitor>
+                    <nexthop>
+                      <ip-address>172.16.96.33</ip-address>
+                    </nexthop>
+                    <bfd>
+                      <profile>None</profile>
+                    </bfd>
+                    <interface>ethernet1/1</interface>
+                    <metric>10</metric>
+                    <destination>0.0.0.0/0</destination>
+                    <route-table>
+                      <unicast/>
+                    </route-table>
+                  </entry>
                   <entry name="10-nets">
                     <path-monitor>
                       <enable>no</enable>
